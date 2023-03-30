@@ -39,12 +39,20 @@ ggplot(countdata3, aes(Study.start.year, cumm, fill=Disease.Type)) +
   scale_x_continuous(breaks=seq(from=2002, to=2022, by=1))+
   scale_y_continuous(expand=c(0,0), limits=c(0,80))+
   scale_fill_brewer(palette="Dark2") +
-  ggtitle("Cummulative number of \nclinical mRNA therapy trials each year (excl. COVID-19)") +
+  ggtitle("Cumulative number of \nclinical mRNA therapy trials each year (excl. COVID-19)") +
   geom_vline(xintercept=2010, linetype="dotted", size=1, color="darkgray") + annotate("text", x=2010, y=75, size=6, label="Moderna founded", hjust=1.02) + 
   geom_vline(xintercept=2019.358, linetype="dotted", size=1, color="darkgray") + annotate("text", 2019.358, 68, label="COVID-19 \ngenome \nsequenced", size=6, hjust=1.02) +
   theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust=1), legend.position="none")+
   bbc_style()
 
-
-
+ggplot(countdata3, aes(Study.start.year, cumm, fill=Disease.Type)) +
+  geom_area(alpha=0.7) +
+  scale_x_continuous(breaks=seq(from=2002, to=2022, by=1))+
+  scale_y_continuous(expand=c(0,0), limits=c(0,80))+
+  scale_fill_brewer(palette="Dark2") +
+  #ggtitle("Cumulative number of \nclinical mRNA therapy trials each year (excl. COVID-19)") +
+  #geom_vline(xintercept=2010, linetype="dotted", size=1, color="darkgray") + annotate("text", x=2010, y=75, size=6, label="Moderna founded", hjust=1.02) + 
+  #geom_vline(xintercept=2019.358, linetype="dotted", size=1, color="darkgray") + annotate("text", 2019.358, 68, label="COVID-19 \ngenome \nsequenced", size=6, hjust=1.02) +
+  theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust=1), legend.position="none")+
+  theme_void()
 
