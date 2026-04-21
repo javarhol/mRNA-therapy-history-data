@@ -1,0 +1,99 @@
+name: Refresh mRNA trial data
+
+on:
+  schedule:
+    # First day of each month at 08:00 UTC. ClinicalTrials.gov is updated
+    # continuously, so monthly is a reasonable cadence.
+    - cron: "0 8 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.4"
+          use-public-rspm: true
+
+      - name: Install R packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::dplyr
+            any::tidyr
+            any::ggplot2
+            any::RColorBrewer
+            any::tibble
+
+      - name: Fetch trials from ClinicalTrials.gov
+        run: python3 scripts/fetch_trials.py
+
+      - name: Classify trials
+        run: python3 scripts/classify.py
+
+      - name: Regenerate figure
+        run: Rscript figures/graph.R
+
+      - name: Summarize diff
+        id: diff
+        run: |
+          if git diff --quiet -- data figures; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "summary<<EOF"
+              python3 - <<'PY'
+          import csv
+          from collections import Counter
+          rows = list(csv.DictReader(open("data/mrna_trials_classified.csv")))
+          non_covid = [r for r in rows if r["is_covid"] == "False"]
+          print(f"**Totals:** {len(rows)} trials ({len(non_covid)} non-COVID)\n")
+          counts = Counter(r["disease_type"] for r in non_covid)
+          print("**Non-COVID by disease type:**")
+          for k in ("Cancer", "Virus", "Genetic Disease", "Other"):
+              if counts.get(k):
+                  print(f"- {k}: {counts[k]}")
+          print()
+          print("**Non-COVID by year (last 8):**")
+          years = sorted({r["start_year"] for r in non_covid if r["start_year"]})[-8:]
+          yc = Counter(r["start_year"] for r in non_covid)
+          for y in years:
+              print(f"- {y}: {yc[y]}")
+          PY
+              echo EOF
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open pull request with refreshed data
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: auto/refresh-trial-data
+          base: main
+          commit-message: "Refresh trial data (${{ github.run_number }})"
+          title: "Monthly refresh: mRNA clinical-trial data"
+          body: |
+            Automated refresh from ClinicalTrials.gov API v2 on ${{ github.run_id }}.
+
+            ${{ steps.diff.outputs.summary }}
+
+            Review the diff on `data/mrna_trials.csv`, `data/mrna_trials_classified.csv`, and the regenerated figure.
+          add-paths: |
+            data/
+            figures/
