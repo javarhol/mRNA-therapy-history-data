@@ -15,6 +15,8 @@ The original dataset and figure supported a 2022 article on [Speaking of Researc
 ![Top 10 Targeted Conditions](figures/top_conditions.png)
 
 ![Top 10 Other Targeted Conditions](figures/other_conditions_breakdown.png)
+
+*View the full breakdown of the "Other" category trials (including direct links to ClinicalTrials.gov) in our [Other Conditions Table](figures/other_conditions_table.md).*
 ## What's in the repo
 
 - **`data/mrna_trials.csv`** — raw fields pulled from the ClinicalTrials.gov v2 API (NCT ID, start date, conditions, interventions, sponsor, etc.) with an `is_covid` flag and a `match_source` confidence tier.
