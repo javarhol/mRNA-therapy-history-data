@@ -6,11 +6,23 @@ The original dataset and figure supported a 2022 article on [Speaking of Researc
 
 ![Cumulative mRNA therapy trials by disease type](figures/mRNA%20therapy%20graph.png)
 
+![New mRNA Therapy Trials Per Year](figures/new_trials_per_year.png)
+
+![Top 10 Companies/Sponsors by Number of Trials](figures/trials_by_company.png)
+
+![Breakdown of Therapy Types](figures/therapy_type_breakdown.png)
+
+![Top 10 Targeted Conditions](figures/top_conditions.png)
+
+![Top 10 Other Targeted Conditions](figures/other_conditions_breakdown.png)
 ## What's in the repo
 
 - **`data/mrna_trials.csv`** — raw fields pulled from the ClinicalTrials.gov v2 API (NCT ID, start date, conditions, interventions, sponsor, etc.) with an `is_covid` flag and a `match_source` confidence tier.
 - **`data/mrna_trials_classified.csv`** — the same rows with derived `disease_type` (Cancer / Virus / Genetic Disease / Other) and `therapy_type` (Vax / Dendritic Vax / IV infusion / Modified T cells / Gene editing / Intratumoral / Subcutaneous / Other) columns.
 - **`figures/graph.R`** — renders the cumulative-area figure from the classified CSV. Year range and y-axis are inferred from the data so the script keeps working as new trials are added.
+- **`figures/additional_visualizations.R`** — renders five additional charts breaking down top sponsors, new trials per year, therapy types, and targeted conditions.
+- **`figures/other_conditions_table.md`** — a generated markdown table providing links to trials categorized under the "Other" disease type.
+- **`scripts/generate_other_table.py`** — generates the `figures/other_conditions_table.md` file using the classified CSV.
 - **`scripts/fetch_trials.py`** — pulls trials whose brief title, official title, or intervention name contains `mRNA` / `messenger RNA`. Uses only the Python standard library.
 - **`scripts/classify.py`** — applies keyword rules to add `disease_type` and `therapy_type`.
 - **`Non-covid mRNA vaccines since 01_01_2020 - Sheet1.csv`** — the original hand-curated dataset, preserved as a historical record.

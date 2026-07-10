@@ -139,6 +139,9 @@ def flatten(study: dict) -> dict | None:
     else:
         return None
 
+    if design.get("studyType", "").upper() != "INTERVENTIONAL":
+        return None
+
     start_date = get(status, "startDateStruct", "date", default="") or ""
     start_year = start_date[:4] if len(start_date) >= 4 else ""
 

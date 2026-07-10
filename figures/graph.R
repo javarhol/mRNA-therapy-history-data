@@ -35,6 +35,7 @@ is_true <- function(x) tolower(as.character(x)) %in% c("true", "1", "yes")
 
 trials <- trials %>%
   filter(!is_true(is_covid)) %>%
+  filter(match_source != "official_title_only") %>%
   filter(disease_type %in% c("Cancer", "Virus", "Genetic Disease")) %>%
   mutate(start_year = suppressWarnings(as.integer(start_year))) %>%
   filter(!is.na(start_year))
